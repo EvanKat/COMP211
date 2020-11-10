@@ -1,0 +1,76 @@
+#!/bin/bash
+
+# Declare curMaxColumn 
+
+# Keeps the Sum and its sorce
+curMaxColumn=0
+fileName=""
+column=""
+
+# Read each file
+for file in "$@"
+do
+	# Declaration of collumns sums
+	curSum1=0
+	curSum2=0
+
+	oldIFS="$IFS"
+	while IFS= read -r str		# Input the line into the str
+	do
+
+		#echo $str
+
+		# Store each number of the line
+		num1=`echo $(cut -f1 -d":" <<< $str)`
+		num2=`echo $(cut -f2 -d":" <<< $str)`
+
+		#echo $num1
+		#echo $num2
+
+		# Store the curent sum
+		curSum1=$(($curSum1 + $num1))
+		curSum2=$(($curSum2 + $num2))
+
+		#echo $curSum1
+		#echo $curSum2
+		#echo ' '
+	IFS="$oldIFS"
+	done < "$file"
+
+	echo $curSum1
+	echo $curSum2
+	echo ' '
+
+	# If column 1 sum is greater than 2
+	if [ "$curSum1" -gt "$curSum2" ]
+	then
+		# If column 1 is greater than prev sum, store
+		if [ "$curSum1" -gt "$curMaxColumn" ]
+		then
+			curMaxColumn=$curSum1
+			fileName=$file
+			column=1
+		fi
+	# If column 2 sum is greater than 2
+	elif [ "$curSum1" -lt "$curSum2" ]
+	then
+		# If column 2 is greater than prev sum, store
+		if [ "$curSum2" -gt "$curMaxColumn" ]
+		then
+			curMaxColumn=$curSum2
+			fileName=$file
+			column=2
+		fi
+	# If they are equal
+	else
+		# If column is greater than prev sum, store (column 1)
+		if [ "$curSum1" -gt "$curMaxColumn" ]
+        then 
+            curMaxColumn=$curSum2
+            fileName=$file 
+            column=1
+        fi
+	fi
+done
+# Print results
+printf "FILE: %s, COLUMN: %d, sum=%d\n" "$fileName" "$column" "$curMaxColumn"
