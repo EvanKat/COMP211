@@ -1,0 +1,31 @@
+#!/bin/bash
+
+
+for file in "$@"
+do
+	#Declare array to store the numbers 
+	declare -a numArray
+
+	# Store number of lines using wc (man wc) or cut and take field 1 of the last line 
+	lines=`wc -l < $file` 
+	#lines=`cat -n $file | tr -s " " | cut -f1 |tail -1`
+	#echo "LINES" $lines
+	
+	# Sort input and store the values into array
+	for num in `sort -nk1 $file`
+	do 
+		numArray+=($num)
+		#echo $num
+	done
+
+	#echo ${numArray[@]}
+
+	maxNum=${numArray[-1]}
+	#echo $maxNum
+	minNum=${numArray[0]}
+	#echo $minNum
+
+	# Print Results
+	printf "FILE:%s, lines:%d, max=%s, min=%s\n" $file $lines $maxNum $minNum
+done
+
